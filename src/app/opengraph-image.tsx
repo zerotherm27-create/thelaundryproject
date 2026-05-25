@@ -141,7 +141,7 @@ export default function OGImage() {
               marginTop: "8px",
             }}
           >
-            {["📦 Free Pickup", "⚡ Same-Day Express", "💳 GCash · Maya · Cash"].map((text) => (
+            {["🚚 Pickup & Delivery", "⚡ Same-Day Express", "💳 GCash · Maya · Cash"].map((text) => (
               <div
                 key={text}
                 style={{
