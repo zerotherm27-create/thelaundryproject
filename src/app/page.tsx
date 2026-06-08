@@ -364,7 +364,7 @@ export default async function HomePage() {
                   <BookingModal variant="primary" label="Book a Pickup Now" messengerUrl={messengerUrl} webUrl={webUrl} />
                   <a
                     href="#pricing"
-                    className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl font-semibold text-base border-2 hover:bg-white/10 transition-all active:scale-95 text-white"
+                    className="btn-ghost-white inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl font-semibold text-base border-2 active:scale-95 text-white"
                     style={{ borderColor: "rgba(255,255,255,0.4)" }}
                   >
                     View Prices <ChevronRight className="w-5 h-5" aria-hidden="true" />

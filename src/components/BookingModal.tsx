@@ -51,7 +51,7 @@ export default function BookingModal({
     ghost:   { color: "#38a9c2", border: "2px solid #b3dde8" },
   };
   const btnBase =
-    "pulse-cta inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl font-bold text-base transition-all hover:opacity-90 hover:shadow-xl active:scale-95 cursor-pointer";
+    "btn-shimmer inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl font-bold text-base active:scale-95 cursor-pointer";
 
   return (
     <>
