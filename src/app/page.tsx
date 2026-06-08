@@ -14,6 +14,7 @@ import FAQLoader from "@/components/FAQLoader";
 import PricingTablesLoader from "@/components/PricingTablesLoader";
 import { createServerClient } from "@/lib/supabase";
 import type { OperatingHour } from "@/lib/supabase";
+import { GradientBackground } from "@/components/ui/gradient-background";
 
 export const metadata: Metadata = {
   title: "The Laundry Project — Professional Laundry & Dry Cleaning in Metro Manila",
@@ -315,126 +316,134 @@ export default async function HomePage() {
           2. Drum depth pulse (.animate-drum-depth)
           3. Wave breathing (.animate-wave-breathe)
       ════════════════════════════════════════════════════════ */}
-      <section
-        id="home"
-        className="relative overflow-hidden"
-        style={{ background: "radial-gradient(ellipse at 68% 55%, rgba(56,169,194,0.09) 0%, transparent 62%), #ffffff" }}
-        aria-labelledby="hero-heading"
-      >
-        {/* ── Far depth layer: dot grid ── */}
-        <div className="hero-grid-far absolute inset-0" aria-hidden="true" />
+      <section id="home" className="relative overflow-hidden" aria-labelledby="hero-heading">
+        <GradientBackground
+          gradients={[
+            "linear-gradient(135deg, #0d3d4f 0%, #38a9c2 100%)",
+            "linear-gradient(135deg, #0a2d3e 0%, #3abcc9 100%)",
+            "linear-gradient(135deg, #0d3d4f 0%, #1f96af 100%)",
+            "linear-gradient(135deg, #134e5e 0%, #3abcc9 100%)",
+            "linear-gradient(135deg, #0d3d4f 0%, #38a9c2 100%)",
+          ]}
+          animationDuration={10}
+          animationDelay={0.5}
+          enableCenterContent={false}
+          className="min-h-0"
+        >
+          {/* ── Far depth layer: dot grid ── */}
+          <div className="hero-grid-far absolute inset-0" aria-hidden="true" />
 
+          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-28">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-28">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+              {/* ── Left: Text content ── */}
+              <AnimateOnScroll variant="fade-up">
+                {/* Location pill */}
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-8" style={{ background: "rgba(255,255,255,0.12)", border: "1px solid rgba(255,255,255,0.25)" }}>
+                  <MapPin className="w-3.5 h-3.5 text-white" aria-hidden="true" />
+                  <span className="text-xs font-semibold text-white">Serving Metro Manila</span>
+                </div>
 
-            {/* ── Left: Text content ── */}
-            <AnimateOnScroll variant="fade-up">
-              {/* Location pill */}
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-8" style={{ background: "rgba(56,169,194,0.1)", border: "1px solid rgba(56,169,194,0.25)" }}>
-                <MapPin className="w-3.5 h-3.5" style={{ color: "#38a9c2" }} aria-hidden="true" />
-                <span className="text-xs font-semibold" style={{ color: "#0d3d4f" }}>Serving Metro Manila</span>
-              </div>
-
-              {/* Headline — solid accent, no gradient fill */}
-              <h1
-                id="hero-heading"
-                className="text-5xl sm:text-6xl lg:text-[5.25rem] font-bold leading-[1.05] mb-6" style={{ color: "#0d3d4f" }}
-              >
-                Fresh Clothes,<br />
-                <span style={{ color: "#fdca00" }}>Zero Hassle.</span>
-              </h1>
-
-              {/* Sub */}
-              <p className="text-lg sm:text-xl leading-relaxed mb-10 max-w-lg" style={{ color: "#475569" }}>
-                Professional laundry, dry cleaning and shoe cleaning across Metro Manila.
-                Book on Messenger and get confirmed in seconds, any time of day.
-              </p>
-
-              {/* CTAs */}
-              <div className="flex flex-col sm:flex-row gap-3 mb-10">
-                <BookingModal variant="primary" label="Book a Pickup Now" messengerUrl={messengerUrl} webUrl={webUrl} />
-                <a
-                  href="#pricing"
-                  className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl font-semibold text-base border-2 hover:bg-slate-50 transition-all active:scale-95"
-                  style={{ color: "#0d3d4f", borderColor: "#b3dde8" }}
+                {/* Headline */}
+                <h1
+                  id="hero-heading"
+                  className="text-5xl sm:text-6xl lg:text-[5.25rem] font-bold leading-[1.05] mb-6 text-white"
                 >
-                  View Prices <ChevronRight className="w-5 h-5" aria-hidden="true" />
-                </a>
-              </div>
+                  Fresh Clothes,<br />
+                  <span style={{ color: "#fdca00" }}>Zero Hassle.</span>
+                </h1>
 
-              {/* Trust badges */}
-              <div className="flex flex-wrap items-center gap-4 sm:gap-7">
-                <div className="flex items-center gap-1.5">
-                  <Zap className="w-3.5 h-3.5 shrink-0" style={{ color: "#fdca00" }} aria-hidden="true" />
-                  <span className="text-sm" style={{ color: "#64748B" }}>Same-day express</span>
-                </div>
-                <span className="hidden sm:inline" style={{ color: "#d1d5db" }} aria-hidden="true">·</span>
-                <div className="flex items-center gap-1.5">
-                  <CreditCard className="w-3.5 h-3.5 shrink-0" style={{ color: "#fdca00" }} aria-hidden="true" />
-                  <span className="text-sm" style={{ color: "#64748B" }}>GCash, Maya & cash</span>
-                </div>
-                <span className="hidden sm:inline" style={{ color: "#d1d5db" }} aria-hidden="true">·</span>
-                <div className="flex items-center gap-1.5">
-                  <MapPin className="w-3.5 h-3.5 shrink-0" style={{ color: "#fdca00" }} aria-hidden="true" />
-                  <span className="text-sm" style={{ color: "#64748B" }}>9 years in Metro Manila</span>
-                </div>
-              </div>
-            </AnimateOnScroll>
+                {/* Sub */}
+                <p className="text-lg sm:text-xl leading-relaxed mb-10 max-w-lg" style={{ color: "rgba(255,255,255,0.82)" }}>
+                  Professional laundry, dry cleaning and shoe cleaning across Metro Manila.
+                  Book on Messenger and get confirmed in seconds, any time of day.
+                </p>
 
-            {/* ── Right: Staff photo ── */}
-            <AnimateOnScroll variant="fade-left" delay={0.2} className="hidden lg:flex justify-center items-end">
-              <div className="relative">
-                {/* Floating bubbles */}
-                {([
-                  { size: 16, top: "10%", left: "4%",  delay: "0s",   dur: "3.5s" },
-                  { size: 10, top: "6%",  left: "84%", delay: "0.9s", dur: "4.2s" },
-                  { size: 20, top: "28%", left: "92%", delay: "1.5s", dur: "3.8s" },
-                ] as { size: number; top: string; left: string; delay: string; dur: string }[]).map((b, i) => (
+                {/* CTAs */}
+                <div className="flex flex-col sm:flex-row gap-3 mb-10">
+                  <BookingModal variant="primary" label="Book a Pickup Now" messengerUrl={messengerUrl} webUrl={webUrl} />
+                  <a
+                    href="#pricing"
+                    className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl font-semibold text-base border-2 hover:bg-white/10 transition-all active:scale-95 text-white"
+                    style={{ borderColor: "rgba(255,255,255,0.4)" }}
+                  >
+                    View Prices <ChevronRight className="w-5 h-5" aria-hidden="true" />
+                  </a>
+                </div>
+
+                {/* Trust badges */}
+                <div className="flex flex-wrap items-center gap-4 sm:gap-7">
+                  <div className="flex items-center gap-1.5">
+                    <Zap className="w-3.5 h-3.5 shrink-0" style={{ color: "#fdca00" }} aria-hidden="true" />
+                    <span className="text-sm" style={{ color: "rgba(255,255,255,0.72)" }}>Same-day express</span>
+                  </div>
+                  <span className="hidden sm:inline" style={{ color: "rgba(255,255,255,0.3)" }} aria-hidden="true">·</span>
+                  <div className="flex items-center gap-1.5">
+                    <CreditCard className="w-3.5 h-3.5 shrink-0" style={{ color: "#fdca00" }} aria-hidden="true" />
+                    <span className="text-sm" style={{ color: "rgba(255,255,255,0.72)" }}>GCash, Maya & cash</span>
+                  </div>
+                  <span className="hidden sm:inline" style={{ color: "rgba(255,255,255,0.3)" }} aria-hidden="true">·</span>
+                  <div className="flex items-center gap-1.5">
+                    <MapPin className="w-3.5 h-3.5 shrink-0" style={{ color: "#fdca00" }} aria-hidden="true" />
+                    <span className="text-sm" style={{ color: "rgba(255,255,255,0.72)" }}>9 years in Metro Manila</span>
+                  </div>
+                </div>
+              </AnimateOnScroll>
+
+              {/* ── Right: Staff photo ── */}
+              <AnimateOnScroll variant="fade-left" delay={0.2} className="hidden lg:flex justify-center items-end">
+                <div className="relative">
+                  {/* Floating bubbles */}
+                  {([
+                    { size: 16, top: "10%", left: "4%",  delay: "0s",   dur: "3.5s" },
+                    { size: 10, top: "6%",  left: "84%", delay: "0.9s", dur: "4.2s" },
+                    { size: 20, top: "28%", left: "92%", delay: "1.5s", dur: "3.8s" },
+                  ] as { size: number; top: string; left: string; delay: string; dur: string }[]).map((b, i) => (
+                    <div
+                      key={i}
+                      className="bubble absolute pointer-events-none z-20"
+                      style={{
+                        width: b.size, height: b.size,
+                        top: b.top, left: b.left,
+                        animationDelay: b.delay, animationDuration: b.dur,
+                        background: "radial-gradient(circle at 35% 35%, rgba(255,255,255,0.9), rgba(56,169,194,0.4))",
+                        border: "1px solid rgba(255,255,255,0.4)",
+                      }}
+                      aria-hidden="true"
+                    />
+                  ))}
+
+                  {/* Fade bottom of image into hero background */}
                   <div
-                    key={i}
-                    className="bubble absolute pointer-events-none z-20"
                     style={{
-                      width: b.size, height: b.size,
-                      top: b.top, left: b.left,
-                      animationDelay: b.delay, animationDuration: b.dur,
-                      background: "radial-gradient(circle at 35% 35%, rgba(255,255,255,0.9), rgba(56,169,194,0.4))",
-                      border: "1px solid rgba(56,169,194,0.3)",
+                      WebkitMaskImage: "linear-gradient(to bottom, black 0%, black 62%, transparent 100%)",
+                      maskImage: "linear-gradient(to bottom, black 0%, black 62%, transparent 100%)",
                     }}
-                    aria-hidden="true"
-                  />
-                ))}
+                  >
+                    <Image
+                      src="/images/hero-staff-new.png"
+                      alt="Laundry Project staff with freshly cleaned laundry"
+                      width={400}
+                      height={480}
+                      className="relative z-10"
+                      priority
+                    />
+                  </div>
 
-                {/* Fade bottom of image into hero background */}
-                <div
-                  style={{
-                    WebkitMaskImage: "linear-gradient(to bottom, black 0%, black 62%, transparent 100%)",
-                    maskImage: "linear-gradient(to bottom, black 0%, black 62%, transparent 100%)",
-                  }}
-                >
-                  <Image
-                    src="/images/hero-staff-new.png"
-                    alt="Laundry Project staff with freshly cleaned laundry"
-                    width={400}
-                    height={480}
-                    className="relative z-10"
-                    priority
-                  />
+                  {/* 9+ years badge */}
+                  <div
+                    className="absolute bottom-10 -left-6 z-20 rounded-2xl shadow-xl px-4 py-3 text-center text-white"
+                    style={{ background: "linear-gradient(135deg, #0d3d4f, #38a9c2)", border: "2px solid rgba(255,255,255,0.18)" }}
+                  >
+                    <p className="text-3xl font-bold leading-none">9+</p>
+                    <p className="text-[10px] font-semibold tracking-wide mt-0.5 opacity-90">YEARS IN</p>
+                    <p className="text-[10px] opacity-70">MAKATI</p>
+                  </div>
                 </div>
-
-                {/* 9+ years badge */}
-                <div
-                  className="absolute bottom-10 -left-6 z-20 rounded-2xl shadow-xl px-4 py-3 text-center text-white"
-                  style={{ background: "linear-gradient(135deg, #0d3d4f, #38a9c2)", border: "2px solid rgba(255,255,255,0.18)" }}
-                >
-                  <p className="text-3xl font-bold leading-none">9+</p>
-                  <p className="text-[10px] font-semibold tracking-wide mt-0.5 opacity-90">YEARS IN</p>
-                  <p className="text-[10px] opacity-70">MAKATI</p>
-                </div>
-              </div>
-            </AnimateOnScroll>
+              </AnimateOnScroll>
+            </div>
           </div>
-        </div>
+        </GradientBackground>
 
         {/* Wave → benefits */}
         <div aria-hidden="true" className="absolute bottom-0 left-0 right-0 pointer-events-none" style={{ height: 80 }}>
@@ -834,13 +843,11 @@ export default async function HomePage() {
               <p className="text-sm" style={{ color: "#64748B" }}>Pay how you want — digital, card, or cash.</p>
             </div>
           </AnimateOnScroll>
-          <StaggerContainer className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 max-w-4xl mx-auto">
+          <StaggerContainer className="grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-4xl mx-auto">
             {([
-              { logo: <GCashSVG />,       name: "GCash",       sub: "Scan QR or send link"    },
-              { logo: <MayaSVG />,        name: "Maya",        sub: "Instant digital payment"  },
-              { logo: <CashSVG />,        name: "Cash",        sub: "Walk-in & pickup"         },
-              { logo: <VisaSVG />,        name: "Visa",        sub: "Credit & debit cards"     },
-              { logo: <MastercardSVG />,  name: "Mastercard",  sub: "Credit & debit cards"     },
+              { logo: <GCashSVG />,  name: "GCash", sub: "Scan QR or send link"   },
+              { logo: <MayaSVG />,   name: "Maya",  sub: "Instant digital payment" },
+              { logo: <CashSVG />,   name: "Cash",  sub: "Walk-in & pickup"        },
             ] as { logo: React.ReactNode; name: string; sub: string }[]).map((p) => (
               <StaggerItem key={p.name} variant="scale">
                 <div
@@ -857,6 +864,27 @@ export default async function HomePage() {
                 </div>
               </StaggerItem>
             ))}
+
+            {/* Visa + Mastercard combined card */}
+            <StaggerItem variant="scale">
+              <div
+                className="flex flex-col items-center gap-3 p-5 rounded-2xl bg-white text-center transition-shadow hover:shadow-md"
+                style={{ border: "1px solid #b3dde8" }}
+              >
+                <div className="flex items-center gap-2">
+                  <div className="w-14 h-9 rounded-lg overflow-hidden">
+                    <VisaSVG />
+                  </div>
+                  <div className="w-14 h-9 rounded-lg overflow-hidden">
+                    <MastercardSVG />
+                  </div>
+                </div>
+                <div>
+                  <p className="font-bold text-sm mb-0.5" style={{ color: "#0F172A" }}>Visa / Mastercard</p>
+                  <p className="text-[11px] leading-snug" style={{ color: "#64748B" }}>Credit &amp; debit cards</p>
+                </div>
+              </div>
+            </StaggerItem>
           </StaggerContainer>
         </div>
 

@@ -1,0 +1,33 @@
+[
+  {
+    "date": "2026-05-24",
+    "verb": "redesign",
+    "scope": "app",
+    "target": "src/app/page.tsx + shared components",
+    "genre": "atmospheric",
+    "macrostructure": "Marquee Hero (marketing)",
+    "theme": "brand-teal-dark — OKLCH anchored on #38a9c2 / #0d3d4f / #fdca00",
+    "type_pairing": "Geist Sans 700 display / Geist Sans 400 body",
+    "animations": [
+      "steam-waft (steam wisps near porthole, 4s cubic-bezier float + dissolve)",
+      "drum-depth (washing machine drum rotation with scale pulse at 45° steps)",
+      "wave-breathe (section divider SVG breathes vertically, 5s ease-in-out)"
+    ],
+    "depth_impression": "depth-press inset shadow + hero-grid-far dot layer + porthole ring SVG mid-layer + steam near-layer",
+    "anti_patterns_fixed": [
+      "gradient-text headline → solid accent-headline (#fdca00)",
+      "gradient hero background → flat #091f2b with depth-press inset shadows",
+      "centred hero → 2-column text-left / machine-right",
+      "3-col uniform icon grid (services) → 2 featured horizontal + 4 compact grid",
+      "eyebrow on every section → removed from Pricing, Payments, FAQ, Location, Contact (5 removed, 2 kept)",
+      "4-col AI footer → 2-col local-business footer",
+      "hover:scale-110 social icons → hover:-translate-y-px (Hallmark microinteraction rule)"
+    ],
+    "files_modified": [
+      "src/app/page.tsx",
+      "src/app/globals.css",
+      "src/components/Footer.tsx"
+    ],
+    "stamp": "Hallmark · genre: atmospheric · macrostructure: Marquee Hero · design-system: brand tokens (globals.css) · designed-as-app"
+  }
+]
