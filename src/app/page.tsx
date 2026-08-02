@@ -14,7 +14,7 @@ import FAQLoader from "@/components/FAQLoader";
 import PricingTablesLoader from "@/components/PricingTablesLoader";
 import { createServerClient } from "@/lib/supabase";
 import type { OperatingHour } from "@/lib/supabase";
-import { GradientBackground } from "@/components/ui/gradient-background";
+import { ShaderBackground } from "@/components/ui/shader-background";
 
 export const metadata: Metadata = {
   title: "The Laundry Project — Professional Laundry & Dry Cleaning in Metro Manila",
@@ -317,23 +317,15 @@ export default async function HomePage() {
           3. Wave breathing (.animate-wave-breathe)
       ════════════════════════════════════════════════════════ */}
       <section id="home" className="relative overflow-hidden" aria-labelledby="hero-heading">
-        <GradientBackground
-          gradients={[
-            "linear-gradient(135deg, #0d3d4f 0%, #38a9c2 100%)",
-            "linear-gradient(135deg, #0a2d3e 0%, #3abcc9 100%)",
-            "linear-gradient(135deg, #0d3d4f 0%, #1f96af 100%)",
-            "linear-gradient(135deg, #134e5e 0%, #3abcc9 100%)",
-            "linear-gradient(135deg, #0d3d4f 0%, #38a9c2 100%)",
-          ]}
-          animationDuration={10}
-          animationDelay={0.5}
-          enableCenterContent={false}
-          className="min-h-0"
-        >
-          {/* ── Far depth layer: dot grid ── */}
-          <div className="hero-grid-far absolute inset-0" aria-hidden="true" />
+        <ShaderBackground className="absolute inset-0" />
 
-          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-28">
+        {/* Legibility scrim — the shader is busier than the old flat gradient */}
+        <div className="absolute inset-0 bg-[#0d3d4f]/35 pointer-events-none" aria-hidden="true" />
+
+        {/* ── Far depth layer: dot grid ── */}
+        <div className="hero-grid-far absolute inset-0" aria-hidden="true" />
+
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-28">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
 
               {/* ── Left: Text content ── */}
@@ -443,7 +435,6 @@ export default async function HomePage() {
               </AnimateOnScroll>
             </div>
           </div>
-        </GradientBackground>
 
         {/* Wave → benefits */}
         <div aria-hidden="true" className="absolute bottom-0 left-0 right-0 pointer-events-none" style={{ height: 80 }}>
