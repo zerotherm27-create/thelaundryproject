@@ -9,10 +9,14 @@ const TLP_TENANT_ID = "8d545ba2-8262-4bf3-aba1-109528789213";
 
 // orders/marketing_events have RLS with no anon SELECT policy — a service
 // role key is required to read them. Server-only; never expose to the client.
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+// Built lazily inside the handler (not at module scope) so a missing env var
+// only breaks this route at request time, not the whole build.
+function getSupabaseAdmin() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+}
 
 function checkAuth(req: NextRequest) {
   const pw = req.headers.get("x-admin-password");
@@ -59,6 +63,7 @@ export async function GET(req: NextRequest) {
   const from = req.nextUrl.searchParams.get("from") ?? defaultFrom;
   const to = req.nextUrl.searchParams.get("to") ?? now.toISOString();
 
+  const supabaseAdmin = getSupabaseAdmin();
   const [ordersRes, eventsRes] = await Promise.all([
     supabaseAdmin
       .from("orders")

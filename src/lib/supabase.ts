@@ -1,7 +1,10 @@
 import { createClient } from "@supabase/supabase-js";
 
-const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+// Fallbacks keep client construction from throwing when these aren't set in
+// a given build environment (e.g. a Preview deployment without them
+// configured) — actual requests still need the real values at runtime.
+const url = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder.supabase.co";
+const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "placeholder-anon-key";
 
 // Public client — used on the website for SELECTs
 export const supabase = createClient(url, anonKey);
