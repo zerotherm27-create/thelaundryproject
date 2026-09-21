@@ -5,7 +5,7 @@ import {
   Plus, Trash2, Save, Eye, EyeOff, GripVertical,
   Clock, Tag, HelpCircle, FileText, LogOut, Check, X, Loader2,
   BarChart2, ExternalLink, LineChart as LineChartIcon, DollarSign,
-  ShoppingBag, MousePointerClick, TrendingUp,
+  ShoppingBag, MousePointerClick, TrendingUp, Users, Percent, Globe2,
 } from "lucide-react";
 import {
   ResponsiveContainer, LineChart, Line, BarChart, Bar,
@@ -737,7 +737,10 @@ type AnalyticsPayload = {
   tracking: {
     total_page_views: number;
     total_booking_clicks: number;
+    total_sessions: number;
     click_through_rate: number;
+    bounce_rate: number;
+    avg_pages_per_session: number;
     by_channel: { messenger: number; web: number };
     by_utm: {
       utm_source: string | null;
@@ -748,6 +751,12 @@ type AnalyticsPayload = {
       booking_clicks: number;
     }[];
     clicks_over_time: { date: string; page_views: number; booking_clicks: number }[];
+    top_pages: { path: string; views: number }[];
+    by_traffic_source: { source: string; sessions: number }[];
+    by_os: { label: string; sessions: number }[];
+    by_browser: { label: string; sessions: number }[];
+    by_device: { label: string; sessions: number }[];
+    by_location: { country: string; city: string; sessions: number }[];
   };
 };
 
@@ -769,7 +778,36 @@ function KpiCard({ icon: Icon, label, value, color }: { icon: React.ElementType;
   );
 }
 
+function BarList({ title, rows, total, color = "#38a9c2" }: { title: string; rows: { label: string; count: number }[]; total: number; color?: string }) {
+  return (
+    <div className="bg-white rounded-2xl border border-slate-200 p-5">
+      <p className="text-sm font-semibold mb-3" style={{ color: "#0F172A" }}>{title}</p>
+      {rows.length === 0 ? (
+        <p className="text-sm py-4 text-center" style={{ color: "#94A3B8" }}>No data yet.</p>
+      ) : (
+        <div className="space-y-2.5">
+          {rows.map((row, i) => {
+            const pct = total ? Math.round((row.count / total) * 100) : 0;
+            return (
+              <div key={i}>
+                <div className="flex items-center justify-between text-xs mb-1">
+                  <span style={{ color: "#0F172A" }}>{row.label}</span>
+                  <span style={{ color: "#64748B" }}>{row.count} · {pct}%</span>
+                </div>
+                <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "#f1f5f9" }}>
+                  <div className="h-full rounded-full" style={{ width: `${pct}%`, background: color }} />
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function InsightsTab({ pw, toast }: { pw: string; toast: (m: string, ok?: boolean) => void }) {
+  const [subTab, setSubTab] = useState<"bookings" | "traffic">("bookings");
   const [data, setData] = useState<AnalyticsPayload | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -798,10 +836,32 @@ function InsightsTab({ pw, toast }: { pw: string; toast: (m: string, ok?: boolea
 
   return (
     <div className="space-y-6 max-w-5xl">
-      <p className="text-xs" style={{ color: "#94A3B8" }}>
-        Last 30 days · {new Date(data.range.from).toLocaleDateString()} – {new Date(data.range.to).toLocaleDateString()}
-      </p>
+      <div className="flex items-center justify-between flex-wrap gap-2">
+        <p className="text-xs" style={{ color: "#94A3B8" }}>
+          Last 30 days · {new Date(data.range.from).toLocaleDateString()} – {new Date(data.range.to).toLocaleDateString()}
+        </p>
+        <div className="flex gap-1 p-1 rounded-full" style={{ background: "#f1f5f9" }}>
+          {([
+            { id: "bookings", label: "Bookings & Campaigns" },
+            { id: "traffic", label: "Site Traffic" },
+          ] as const).map((t) => (
+            <button
+              key={t.id}
+              onClick={() => setSubTab(t.id)}
+              className="px-4 py-1.5 rounded-full text-xs font-semibold transition-colors"
+              style={{
+                background: subTab === t.id ? "#38a9c2" : "transparent",
+                color: subTab === t.id ? "#fff" : "#64748B",
+              }}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+      </div>
 
+      {subTab === "bookings" && (
+      <>
       {/* KPI row */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
         <KpiCard icon={ShoppingBag} label="Orders" value={String(data.orders.total_orders)} color="#38a9c2" />
@@ -810,6 +870,9 @@ function InsightsTab({ pw, toast }: { pw: string; toast: (m: string, ok?: boolea
         <KpiCard icon={MousePointerClick} label="Booking clicks" value={String(data.tracking.total_booking_clicks)} color="#fdca00" />
         <KpiCard icon={LineChartIcon} label="Click-through rate" value={`${(data.tracking.click_through_rate * 100).toFixed(1)}%`} color="#1877f2" />
       </div>
+      <p className="text-xs -mt-3" style={{ color: "#94A3B8" }}>
+        Click-through rate is booking clicks ÷ visiting sessions (see Site Traffic for session counts).
+      </p>
 
       {/* Orders over time */}
       <div className="bg-white rounded-2xl border border-slate-200 p-5">
@@ -914,6 +977,103 @@ function InsightsTab({ pw, toast }: { pw: string; toast: (m: string, ok?: boolea
           </table>
         </div>
       </div>
+      </>
+      )}
+
+      {subTab === "traffic" && (
+      <>
+      {/* KPI row */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <KpiCard icon={Globe2} label="Page views" value={String(data.tracking.total_page_views)} color="#38a9c2" />
+        <KpiCard icon={Users} label="Sessions" value={String(data.tracking.total_sessions)} color="#0d3d4f" />
+        <KpiCard icon={Percent} label="Bounce rate" value={`${(data.tracking.bounce_rate * 100).toFixed(1)}%`} color="#ef4444" />
+        <KpiCard icon={TrendingUp} label="Avg pages / session" value={data.tracking.avg_pages_per_session.toFixed(1)} color="#fdca00" />
+      </div>
+
+      {/* Traffic source + top pages */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <BarList
+          title="Traffic source"
+          rows={data.tracking.by_traffic_source.map((r) => ({ label: r.source, count: r.sessions }))}
+          total={data.tracking.total_sessions}
+          color="#38a9c2"
+        />
+        <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+          <div className="px-5 py-4 border-b border-slate-100">
+            <p className="text-sm font-semibold" style={{ color: "#0F172A" }}>Top pages</p>
+          </div>
+          {data.tracking.top_pages.length === 0 ? (
+            <p className="text-sm py-8 text-center" style={{ color: "#94A3B8" }}>No page views yet.</p>
+          ) : (
+            <table className="w-full text-sm">
+              <tbody className="divide-y divide-slate-100">
+                {data.tracking.top_pages.map((row, i) => (
+                  <tr key={i}>
+                    <td className="px-5 py-2.5">{row.path}</td>
+                    <td className="px-5 py-2.5 text-right font-semibold" style={{ color: "#38a9c2" }}>{row.views}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+      </div>
+
+      {/* Device / OS / Browser */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+        <BarList
+          title="Device"
+          rows={data.tracking.by_device.map((r) => ({ label: r.label, count: r.sessions }))}
+          total={data.tracking.total_sessions}
+          color="#1877f2"
+        />
+        <BarList
+          title="OS"
+          rows={data.tracking.by_os.map((r) => ({ label: r.label, count: r.sessions }))}
+          total={data.tracking.total_sessions}
+          color="#0d3d4f"
+        />
+        <BarList
+          title="Browser"
+          rows={data.tracking.by_browser.map((r) => ({ label: r.label, count: r.sessions }))}
+          total={data.tracking.total_sessions}
+          color="#fdca00"
+        />
+      </div>
+
+      {/* Location */}
+      <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+        <div className="px-5 py-4 border-b border-slate-100">
+          <p className="text-sm font-semibold" style={{ color: "#0F172A" }}>Top locations</p>
+          <p className="text-xs mt-0.5" style={{ color: "#94A3B8" }}>
+            Country/city only, resolved from Vercel&apos;s edge network — no visitor IP address is ever stored.
+          </p>
+        </div>
+        {data.tracking.by_location.length === 0 ? (
+          <p className="text-sm py-8 text-center" style={{ color: "#94A3B8" }}>No location data yet.</p>
+        ) : (
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="text-left" style={{ color: "#94A3B8" }}>
+                <th className="px-5 py-2 font-medium">City</th>
+                <th className="px-5 py-2 font-medium">Country</th>
+                <th className="px-5 py-2 font-medium text-right">Sessions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {data.tracking.by_location.map((row, i) => (
+                <tr key={i}>
+                  <td className="px-5 py-2.5">{row.city}</td>
+                  <td className="px-5 py-2.5">{row.country}</td>
+                  <td className="px-5 py-2.5 text-right font-semibold" style={{ color: "#38a9c2" }}>{row.sessions}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+      </>
+      )}
     </div>
   );
 }

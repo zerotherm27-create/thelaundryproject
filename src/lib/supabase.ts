@@ -77,4 +77,10 @@ export type MarketingEvent = {
   utm_campaign: string | null;
   utm_content: string | null;
   utm_term: string | null;
+  country: string | null;
+  region: string | null;
+  city: string | null;
+  os: string | null;
+  browser: string | null;
+  device_type: "mobile" | "tablet" | "desktop" | null;
 };
