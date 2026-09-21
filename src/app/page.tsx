@@ -317,127 +317,123 @@ export default async function HomePage() {
           3. Wave breathing (.animate-wave-breathe)
       ════════════════════════════════════════════════════════ */}
       <section id="home" className="relative overflow-hidden" aria-labelledby="hero-heading">
-        <ShaderBackground className="absolute inset-0" />
+        {/* Full-bleed staff photo — swap /images/hero-full-bleed.png for the real wide shop photo when it's ready */}
+        <div className="absolute inset-0 z-0 bg-[#0d3d4f]">
+          <Image
+            src="/images/hero-full-bleed.jpg"
+            alt="The Laundry Project staff member loading a washing machine in the Makati shop"
+            fill
+            sizes="100vw"
+            className="object-cover"
+            preload
+          />
+        </div>
 
-        {/* Legibility scrim — the shader is busier than the old flat gradient */}
-        <div className="absolute inset-0 bg-[#0d3d4f]/35 pointer-events-none" aria-hidden="true" />
+        {/* Shader kept as a tint over the photo for brand motion, not the base layer */}
+        <ShaderBackground className="absolute inset-0 z-[1] mix-blend-multiply opacity-50" />
+
+        {/* Legibility scrim — darkest where the text sits (left), fading toward the photo */}
+        <div
+          className="absolute inset-0 z-[2] pointer-events-none"
+          style={{ background: "linear-gradient(115deg, rgba(13,61,79,0.88) 0%, rgba(13,61,79,0.55) 42%, rgba(13,61,79,0.15) 70%, rgba(13,61,79,0.35) 100%)" }}
+          aria-hidden="true"
+        />
+        <div
+          className="absolute inset-0 z-[2] pointer-events-none"
+          style={{ background: "linear-gradient(to top, rgba(13,61,79,0.55) 0%, transparent 35%)" }}
+          aria-hidden="true"
+        />
 
         {/* ── Far depth layer: dot grid ── */}
-        <div className="hero-grid-far absolute inset-0" aria-hidden="true" />
+        <div className="hero-grid-far absolute inset-0 z-[3]" aria-hidden="true" />
+
+        {/* Floating bubbles */}
+        {([
+          { size: 16, top: "10%", left: "4%",  delay: "0s",   dur: "3.5s" },
+          { size: 10, top: "6%",  left: "84%", delay: "0.9s", dur: "4.2s" },
+          { size: 20, top: "28%", left: "92%", delay: "1.5s", dur: "3.8s" },
+        ] as { size: number; top: string; left: string; delay: string; dur: string }[]).map((b, i) => (
+          <div
+            key={i}
+            className="bubble absolute pointer-events-none z-[4]"
+            style={{
+              width: b.size, height: b.size,
+              top: b.top, left: b.left,
+              animationDelay: b.delay, animationDuration: b.dur,
+              background: "radial-gradient(circle at 35% 35%, rgba(255,255,255,0.9), rgba(56,169,194,0.4))",
+              border: "1px solid rgba(255,255,255,0.4)",
+            }}
+            aria-hidden="true"
+          />
+        ))}
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-28">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <AnimateOnScroll variant="fade-up" className="max-w-xl">
+              {/* Location pill */}
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-8" style={{ background: "rgba(255,255,255,0.12)", border: "1px solid rgba(255,255,255,0.25)" }}>
+                <MapPin className="w-3.5 h-3.5 text-white" aria-hidden="true" />
+                <span className="text-xs font-semibold text-white">Serving Metro Manila</span>
+              </div>
 
-              {/* ── Left: Text content ── */}
-              <AnimateOnScroll variant="fade-up">
-                {/* Location pill */}
-                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-8" style={{ background: "rgba(255,255,255,0.12)", border: "1px solid rgba(255,255,255,0.25)" }}>
-                  <MapPin className="w-3.5 h-3.5 text-white" aria-hidden="true" />
-                  <span className="text-xs font-semibold text-white">Serving Metro Manila</span>
-                </div>
+              {/* Headline */}
+              <h1
+                id="hero-heading"
+                className="text-5xl sm:text-6xl lg:text-[5.25rem] font-bold leading-[1.05] mb-6 text-white"
+              >
+                Fresh Clothes,<br />
+                <span style={{ color: "#fdca00" }}>Zero Hassle.</span>
+              </h1>
 
-                {/* Headline */}
-                <h1
-                  id="hero-heading"
-                  className="text-5xl sm:text-6xl lg:text-[5.25rem] font-bold leading-[1.05] mb-6 text-white"
+              {/* Sub */}
+              <p className="text-lg sm:text-xl leading-relaxed mb-10 max-w-lg" style={{ color: "rgba(255,255,255,0.82)" }}>
+                Professional laundry, dry cleaning and shoe cleaning across Metro Manila.
+                Book on Messenger and get confirmed in seconds, any time of day.
+              </p>
+
+              {/* CTAs */}
+              <div className="flex flex-col sm:flex-row gap-3 mb-10">
+                <BookingModal variant="primary" label="Book a Pickup Now" messengerUrl={messengerUrl} webUrl={webUrl} />
+                <a
+                  href="#pricing"
+                  className="btn-ghost-white inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl font-semibold text-base border-2 active:scale-95 text-white"
+                  style={{ borderColor: "rgba(255,255,255,0.4)" }}
                 >
-                  Fresh Clothes,<br />
-                  <span style={{ color: "#fdca00" }}>Zero Hassle.</span>
-                </h1>
+                  View Prices <ChevronRight className="w-5 h-5" aria-hidden="true" />
+                </a>
+              </div>
 
-                {/* Sub */}
-                <p className="text-lg sm:text-xl leading-relaxed mb-10 max-w-lg" style={{ color: "rgba(255,255,255,0.82)" }}>
-                  Professional laundry, dry cleaning and shoe cleaning across Metro Manila.
-                  Book on Messenger and get confirmed in seconds, any time of day.
-                </p>
-
-                {/* CTAs */}
-                <div className="flex flex-col sm:flex-row gap-3 mb-10">
-                  <BookingModal variant="primary" label="Book a Pickup Now" messengerUrl={messengerUrl} webUrl={webUrl} />
-                  <a
-                    href="#pricing"
-                    className="btn-ghost-white inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl font-semibold text-base border-2 active:scale-95 text-white"
-                    style={{ borderColor: "rgba(255,255,255,0.4)" }}
-                  >
-                    View Prices <ChevronRight className="w-5 h-5" aria-hidden="true" />
-                  </a>
+              {/* Trust badges */}
+              <div className="flex flex-wrap items-center gap-4 sm:gap-7">
+                <div className="flex items-center gap-1.5">
+                  <Zap className="w-3.5 h-3.5 shrink-0" style={{ color: "#fdca00" }} aria-hidden="true" />
+                  <span className="text-sm" style={{ color: "rgba(255,255,255,0.72)" }}>Same-day express</span>
                 </div>
-
-                {/* Trust badges */}
-                <div className="flex flex-wrap items-center gap-4 sm:gap-7">
-                  <div className="flex items-center gap-1.5">
-                    <Zap className="w-3.5 h-3.5 shrink-0" style={{ color: "#fdca00" }} aria-hidden="true" />
-                    <span className="text-sm" style={{ color: "rgba(255,255,255,0.72)" }}>Same-day express</span>
-                  </div>
-                  <span className="hidden sm:inline" style={{ color: "rgba(255,255,255,0.3)" }} aria-hidden="true">·</span>
-                  <div className="flex items-center gap-1.5">
-                    <CreditCard className="w-3.5 h-3.5 shrink-0" style={{ color: "#fdca00" }} aria-hidden="true" />
-                    <span className="text-sm" style={{ color: "rgba(255,255,255,0.72)" }}>GCash, Maya & cash</span>
-                  </div>
-                  <span className="hidden sm:inline" style={{ color: "rgba(255,255,255,0.3)" }} aria-hidden="true">·</span>
-                  <div className="flex items-center gap-1.5">
-                    <MapPin className="w-3.5 h-3.5 shrink-0" style={{ color: "#fdca00" }} aria-hidden="true" />
-                    <span className="text-sm" style={{ color: "rgba(255,255,255,0.72)" }}>9 years in Metro Manila</span>
-                  </div>
+                <span className="hidden sm:inline" style={{ color: "rgba(255,255,255,0.3)" }} aria-hidden="true">·</span>
+                <div className="flex items-center gap-1.5">
+                  <CreditCard className="w-3.5 h-3.5 shrink-0" style={{ color: "#fdca00" }} aria-hidden="true" />
+                  <span className="text-sm" style={{ color: "rgba(255,255,255,0.72)" }}>GCash, Maya & cash</span>
                 </div>
-              </AnimateOnScroll>
-
-              {/* ── Right: Staff photo ── */}
-              <AnimateOnScroll variant="fade-left" delay={0.2} className="hidden lg:flex justify-center items-end">
-                <div className="relative">
-                  {/* Floating bubbles */}
-                  {([
-                    { size: 16, top: "10%", left: "4%",  delay: "0s",   dur: "3.5s" },
-                    { size: 10, top: "6%",  left: "84%", delay: "0.9s", dur: "4.2s" },
-                    { size: 20, top: "28%", left: "92%", delay: "1.5s", dur: "3.8s" },
-                  ] as { size: number; top: string; left: string; delay: string; dur: string }[]).map((b, i) => (
-                    <div
-                      key={i}
-                      className="bubble absolute pointer-events-none z-20"
-                      style={{
-                        width: b.size, height: b.size,
-                        top: b.top, left: b.left,
-                        animationDelay: b.delay, animationDuration: b.dur,
-                        background: "radial-gradient(circle at 35% 35%, rgba(255,255,255,0.9), rgba(56,169,194,0.4))",
-                        border: "1px solid rgba(255,255,255,0.4)",
-                      }}
-                      aria-hidden="true"
-                    />
-                  ))}
-
-                  {/* Fade bottom of image into hero background */}
-                  <div
-                    style={{
-                      WebkitMaskImage: "linear-gradient(to bottom, black 0%, black 62%, transparent 100%)",
-                      maskImage: "linear-gradient(to bottom, black 0%, black 62%, transparent 100%)",
-                    }}
-                  >
-                    <Image
-                      src="/images/hero-staff-new.png"
-                      alt="Laundry Project staff with freshly cleaned laundry"
-                      width={400}
-                      height={480}
-                      className="relative z-10"
-                      priority
-                    />
-                  </div>
-
-                  {/* 9+ years badge */}
-                  <div
-                    className="absolute bottom-10 -left-6 z-20 rounded-2xl shadow-xl px-4 py-3 text-center text-white"
-                    style={{ background: "linear-gradient(135deg, #0d3d4f, #38a9c2)", border: "2px solid rgba(255,255,255,0.18)" }}
-                  >
-                    <p className="text-3xl font-bold leading-none">9+</p>
-                    <p className="text-[10px] font-semibold tracking-wide mt-0.5 opacity-90">YEARS IN</p>
-                    <p className="text-[10px] opacity-70">MAKATI</p>
-                  </div>
+                <span className="hidden sm:inline" style={{ color: "rgba(255,255,255,0.3)" }} aria-hidden="true">·</span>
+                <div className="flex items-center gap-1.5">
+                  <MapPin className="w-3.5 h-3.5 shrink-0" style={{ color: "#fdca00" }} aria-hidden="true" />
+                  <span className="text-sm" style={{ color: "rgba(255,255,255,0.72)" }}>9 years in Metro Manila</span>
                 </div>
-              </AnimateOnScroll>
+              </div>
+            </AnimateOnScroll>
+
+            {/* 9+ years badge */}
+            <div
+              className="absolute bottom-8 right-6 lg:right-12 z-10 rounded-2xl shadow-xl px-4 py-3 text-center text-white"
+              style={{ background: "linear-gradient(135deg, #0d3d4f, #38a9c2)", border: "2px solid rgba(255,255,255,0.18)" }}
+            >
+              <p className="text-3xl font-bold leading-none">9+</p>
+              <p className="text-[10px] font-semibold tracking-wide mt-0.5 opacity-90">YEARS IN</p>
+              <p className="text-[10px] opacity-70">MAKATI</p>
             </div>
           </div>
 
         {/* Wave → benefits */}
-        <div aria-hidden="true" className="absolute bottom-0 left-0 right-0 pointer-events-none" style={{ height: 80 }}>
+        <div aria-hidden="true" className="absolute bottom-0 left-0 right-0 z-[5] pointer-events-none" style={{ height: 80 }}>
           <svg viewBox="0 0 1440 80" preserveAspectRatio="none" className="w-full h-full" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M0,55 Q720,0 1440,55 L1440,80 L0,80 Z" fill="#dff0f7"/>
           </svg>
