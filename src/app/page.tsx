@@ -316,14 +316,16 @@ export default async function HomePage() {
           3. Wave breathing (.animate-wave-breathe)
       ════════════════════════════════════════════════════════ */}
       <section id="home" className="relative overflow-hidden" aria-labelledby="hero-heading">
-        {/* Full-bleed staff photo — swap /images/hero-full-bleed.png for the real wide shop photo when it's ready */}
+        {/* Full-bleed staff photo. object-position keeps the staff member in frame on narrow/tall
+            viewports, where object-cover would otherwise crop to the image's horizontal center
+            (the hallway/fans behind her) and cut her out of the shot entirely. */}
         <div className="absolute inset-0 z-0 bg-[#0d3d4f]">
           <Image
             src="/images/hero-full-bleed.jpg"
             alt="The Laundry Project staff member loading a washing machine in the Makati shop"
             fill
             sizes="100vw"
-            className="object-cover"
+            className="object-cover object-[72%_center] lg:object-center"
             preload
           />
         </div>
