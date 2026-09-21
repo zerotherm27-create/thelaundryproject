@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { classifyUserAgent } from "@/lib/useragent";
 
 const EVENT_TYPES = new Set(["page_view", "booking_click"]);
 const CHANNELS = new Set(["messenger", "web"]);
@@ -40,6 +41,23 @@ export async function POST(req: NextRequest) {
     channel = body.channel;
   }
 
+  // Device + location come only from server-side request headers — the
+  // client cannot influence these via the POST body (these field names are
+  // never read from `body`). Vercel resolves geolocation at the edge and
+  // hands us country/region/city only; the raw visitor IP is never stored.
+  const ua = classifyUserAgent(req.headers.get("user-agent"));
+  const country = clip(req.headers.get("x-vercel-ip-country"), 100);
+  const region = clip(req.headers.get("x-vercel-ip-country-region"), 100);
+  const rawCity = req.headers.get("x-vercel-ip-city");
+  let city: string | null = null;
+  if (rawCity) {
+    try {
+      city = clip(decodeURIComponent(rawCity), MAX_FIELD_LEN);
+    } catch {
+      city = null;
+    }
+  }
+
   // Explicit whitelist — never spread the raw request body into the insert.
   const row = {
     event_type,
@@ -52,13 +70,15 @@ export async function POST(req: NextRequest) {
     utm_campaign: clip(body.utm_campaign, MAX_FIELD_LEN),
     utm_content: clip(body.utm_content, MAX_FIELD_LEN),
     utm_term: clip(body.utm_term, MAX_FIELD_LEN),
+    country,
+    region,
+    city,
+    os: ua.os,
+    browser: ua.browser,
+    device_type: ua.device_type,
   };
 
   const { error } = await supabase.from("marketing_events").insert(row);
-  if (error) {
-    // Duplicate page_view for an existing session (refresh) — treat as success.
-    if (error.code === "23505") return NextResponse.json({ ok: true });
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json({ ok: true });
 }

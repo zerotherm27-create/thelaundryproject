@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { decodeMessengerRef } from "@/lib/attribution";
+import { classifyTrafficSource } from "@/lib/analytics";
 
 // This Supabase project ("laundrobot") is shared by several tenants' bot
 // backends. Every query against shared tables MUST filter to this tenant,
@@ -45,6 +46,14 @@ type EventRow = {
   channel: "messenger" | "web" | null;
   created_at: string;
   session_id: string;
+  path: string | null;
+  referrer: string | null;
+  country: string | null;
+  region: string | null;
+  city: string | null;
+  os: string | null;
+  browser: string | null;
+  device_type: "mobile" | "tablet" | "desktop" | null;
 };
 
 function dayKey(iso: string) {
@@ -75,7 +84,7 @@ export async function GET(req: NextRequest) {
       .limit(5000),
     supabaseAdmin
       .from("marketing_events")
-      .select("event_type, utm_source, utm_medium, utm_campaign, utm_content, utm_term, channel, created_at, session_id")
+      .select("event_type, utm_source, utm_medium, utm_campaign, utm_content, utm_term, channel, created_at, session_id, path, referrer, country, region, city, os, browser, device_type")
       .eq("tenant_id", TLP_TENANT_ID)
       .gte("created_at", from)
       .lte("created_at", to)
@@ -136,7 +145,81 @@ export async function GET(req: NextRequest) {
   const bookingClicks = events.filter((e) => e.event_type === "booking_click");
   const total_page_views = pageViews.length;
   const total_booking_clicks = bookingClicks.length;
-  const click_through_rate = total_page_views ? total_booking_clicks / total_page_views : 0;
+
+  // A session can now produce several page_view rows (every route change
+  // logs one), so distinct sessions — not raw page_view rows — is the right
+  // denominator for click-through rate.
+  const sessionIds = new Set(pageViews.map((e) => e.session_id));
+  const total_sessions = sessionIds.size;
+  const click_through_rate = total_sessions ? total_booking_clicks / total_sessions : 0;
+
+  // One row per session (its first page view) — visitor-level attributes
+  // (referrer/utm/device/geo) are constant across a session, so classifying
+  // off just the first view avoids letting an active session's later page
+  // views skew source/device/location splits.
+  const sessionsFirstView = new Map<string, EventRow>();
+  for (const e of [...pageViews].sort((a, b) => a.created_at.localeCompare(b.created_at))) {
+    if (!sessionsFirstView.has(e.session_id)) sessionsFirstView.set(e.session_id, e);
+  }
+
+  const pageViewsPerSession = new Map<string, number>();
+  for (const e of pageViews) {
+    pageViewsPerSession.set(e.session_id, (pageViewsPerSession.get(e.session_id) ?? 0) + 1);
+  }
+  const bouncedSessions = [...pageViewsPerSession.values()].filter((count) => count === 1).length;
+  const bounce_rate = total_sessions ? bouncedSessions / total_sessions : 0;
+  const avg_pages_per_session = total_sessions ? total_page_views / total_sessions : 0;
+
+  const pageCounts = new Map<string, number>();
+  for (const e of pageViews) {
+    const path = e.path ?? "(unknown)";
+    pageCounts.set(path, (pageCounts.get(path) ?? 0) + 1);
+  }
+  const top_pages = [...pageCounts.entries()]
+    .map(([path, views]) => ({ path, views }))
+    .sort((a, b) => b.views - a.views)
+    .slice(0, 10);
+
+  const sourceCounts = new Map<string, number>();
+  const osCounts = new Map<string, number>();
+  const browserCounts = new Map<string, number>();
+  const deviceCounts = new Map<string, number>();
+  const locationCounts = new Map<string, { country: string; city: string; sessions: number }>();
+  for (const e of sessionsFirstView.values()) {
+    const source = classifyTrafficSource(e.referrer, e.utm_source, e.utm_medium);
+    sourceCounts.set(source, (sourceCounts.get(source) ?? 0) + 1);
+
+    const os = e.os ?? "(unknown)";
+    osCounts.set(os, (osCounts.get(os) ?? 0) + 1);
+
+    const browser = e.browser ?? "(unknown)";
+    browserCounts.set(browser, (browserCounts.get(browser) ?? 0) + 1);
+
+    const device = e.device_type ?? "(unknown)";
+    deviceCounts.set(device, (deviceCounts.get(device) ?? 0) + 1);
+
+    const country = e.country ?? "(unknown)";
+    const city = e.city ?? "(unknown)";
+    const locKey = `${city}, ${country}`;
+    const locBucket = locationCounts.get(locKey) ?? { country, city, sessions: 0 };
+    locBucket.sessions += 1;
+    locationCounts.set(locKey, locBucket);
+  }
+  const by_traffic_source = [...sourceCounts.entries()]
+    .map(([source, sessions]) => ({ source, sessions }))
+    .sort((a, b) => b.sessions - a.sessions);
+  const by_os = [...osCounts.entries()]
+    .map(([label, sessions]) => ({ label, sessions }))
+    .sort((a, b) => b.sessions - a.sessions);
+  const by_browser = [...browserCounts.entries()]
+    .map(([label, sessions]) => ({ label, sessions }))
+    .sort((a, b) => b.sessions - a.sessions);
+  const by_device = [...deviceCounts.entries()]
+    .map(([label, sessions]) => ({ label, sessions }))
+    .sort((a, b) => b.sessions - a.sessions);
+  const by_location = [...locationCounts.values()]
+    .sort((a, b) => b.sessions - a.sessions)
+    .slice(0, 10);
 
   const by_channel = { messenger: 0, web: 0 };
   for (const c of bookingClicks) {
@@ -182,10 +265,19 @@ export async function GET(req: NextRequest) {
     tracking: {
       total_page_views,
       total_booking_clicks,
+      total_sessions,
       click_through_rate,
+      bounce_rate,
+      avg_pages_per_session,
       by_channel,
       by_utm,
       clicks_over_time,
+      top_pages,
+      by_traffic_source,
+      by_os,
+      by_browser,
+      by_device,
+      by_location,
     },
   });
 }
