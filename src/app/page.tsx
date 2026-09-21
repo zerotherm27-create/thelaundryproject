@@ -320,8 +320,8 @@ export default async function HomePage() {
         {/* Full-bleed staff photo — swap /images/hero-full-bleed.png for the real wide shop photo when it's ready */}
         <div className="absolute inset-0 z-0 bg-[#0d3d4f]">
           <Image
-            src="/images/hero-full-bleed.png"
-            alt="Laundry Project staff at work in the Makati shop"
+            src="/images/hero-full-bleed.jpg"
+            alt="The Laundry Project staff member loading a washing machine in the Makati shop"
             fill
             sizes="100vw"
             className="object-cover"
