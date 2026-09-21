@@ -14,7 +14,6 @@ import FAQLoader from "@/components/FAQLoader";
 import PricingTablesLoader from "@/components/PricingTablesLoader";
 import { createServerClient } from "@/lib/supabase";
 import type { OperatingHour } from "@/lib/supabase";
-import { ShaderBackground } from "@/components/ui/shader-background";
 
 export const metadata: Metadata = {
   title: "The Laundry Project — Professional Laundry & Dry Cleaning in Metro Manila",
@@ -329,9 +328,6 @@ export default async function HomePage() {
           />
         </div>
 
-        {/* Shader kept as a tint over the photo for brand motion, not the base layer */}
-        <ShaderBackground className="absolute inset-0 z-[1] mix-blend-multiply opacity-50" />
-
         {/* Legibility scrim — darkest where the text sits (left), fading toward the photo */}
         <div
           className="absolute inset-0 z-[2] pointer-events-none"
@@ -421,9 +417,9 @@ export default async function HomePage() {
               </div>
             </AnimateOnScroll>
 
-            {/* 9+ years badge */}
+            {/* 9+ years badge — desktop only; on mobile the same info is in the trust-badges row above, and the text column has no headroom for an absolutely-positioned badge without overlap */}
             <div
-              className="absolute bottom-8 right-6 lg:right-12 z-10 rounded-2xl shadow-xl px-4 py-3 text-center text-white"
+              className="hidden lg:block absolute bottom-8 right-6 lg:right-12 z-10 rounded-2xl shadow-xl px-4 py-3 text-center text-white"
               style={{ background: "linear-gradient(135deg, #0d3d4f, #38a9c2)", border: "2px solid rgba(255,255,255,0.18)" }}
             >
               <p className="text-3xl font-bold leading-none">9+</p>
