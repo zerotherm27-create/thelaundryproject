@@ -5,6 +5,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import CookieConsent from "@/components/CookieConsent";
 import Analytics from "@/components/Analytics";
+import UtmCapture from "@/components/UtmCapture";
 import { createServerClient } from "@/lib/supabase";
 
 const geistSans = Geist({
@@ -60,6 +61,7 @@ export default async function RootLayout({
         <main className="flex-1">{children}</main>
         <Footer />
         <CookieConsent />
+        <UtmCapture />
         <Analytics {...analyticsIds} />
       </body>
     </html>

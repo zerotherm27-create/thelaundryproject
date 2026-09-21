@@ -3,9 +3,24 @@
 import { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { MessageCircle, Globe, X, ChevronRight } from "lucide-react";
+import { getAttribution, getOrCreateSessionId, buildMessengerUrl, buildWebBookingUrl } from "@/lib/attribution";
 
 const DEFAULT_MESSENGER_URL = "https://m.me/thelaundryprojectph?ref=website";
 const DEFAULT_WEB_URL       = "https://book.thelaundryproject.app";
+
+function logBookingClick(channel: "messenger" | "web") {
+  fetch("/api/track", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      event_type: "booking_click",
+      channel,
+      session_id: getOrCreateSessionId(),
+      path: typeof window !== "undefined" ? window.location.pathname : undefined,
+      ...(getAttribution() ?? {}),
+    }),
+  }).catch(() => {});
+}
 
 interface BookingModalProps {
   /** Visual style of the trigger button */
@@ -28,6 +43,9 @@ export default function BookingModal({
   const MESSENGER_URL = messengerUrl || DEFAULT_MESSENGER_URL;
   const WEB_URL       = webUrl       || DEFAULT_WEB_URL;
   const [open, setOpen] = useState(false);
+  const attribution = open ? getAttribution() : null;
+  const finalMessengerUrl = open ? buildMessengerUrl(MESSENGER_URL, attribution) : MESSENGER_URL;
+  const finalWebUrl       = open ? buildWebBookingUrl(WEB_URL, attribution)       : WEB_URL;
   const dialogRef = useRef<HTMLDivElement>(null);
 
   /* ── Close on ESC ── */
@@ -117,10 +135,10 @@ export default function BookingModal({
               <div className="flex flex-col gap-3">
                 {/* Facebook Messenger */}
                 <a
-                  href={MESSENGER_URL}
+                  href={finalMessengerUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  onClick={() => setOpen(false)}
+                  onClick={() => { logBookingClick("messenger"); setOpen(false); }}
                   className="group flex items-center gap-4 p-4 rounded-2xl transition-all hover:scale-[1.01] active:scale-[0.99]"
                   style={{ background: "#f0f7ff", border: "2px solid #1877f2" }}
                 >
@@ -144,10 +162,10 @@ export default function BookingModal({
 
                 {/* Web Booking */}
                 <a
-                  href={WEB_URL}
+                  href={finalWebUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  onClick={() => setOpen(false)}
+                  onClick={() => { logBookingClick("web"); setOpen(false); }}
                   className="group flex items-center gap-4 p-4 rounded-2xl transition-all hover:scale-[1.01] active:scale-[0.99]"
                   style={{ background: "#f0fbfd", border: "2px solid #38a9c2" }}
                 >
