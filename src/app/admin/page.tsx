@@ -4,8 +4,13 @@ import { useState, useEffect, useCallback } from "react";
 import {
   Plus, Trash2, Save, Eye, EyeOff, GripVertical,
   Clock, Tag, HelpCircle, FileText, LogOut, Check, X, Loader2,
-  BarChart2, ExternalLink,
+  BarChart2, ExternalLink, LineChart as LineChartIcon, DollarSign,
+  ShoppingBag, MousePointerClick, TrendingUp,
 } from "lucide-react";
+import {
+  ResponsiveContainer, LineChart, Line, BarChart, Bar,
+  XAxis, YAxis, CartesianGrid, Tooltip, Legend,
+} from "recharts";
 
 // ── Types ────────────────────────────────────────────────────
 type Category = { id: string; name: string; subtitle: string; sort_order: number; is_published: boolean };
@@ -15,11 +20,12 @@ type FaqItem = { id: string; question: string; answer: string; sort_order: numbe
 type ContentItem = { key: string; label: string; value: string; section: string };
 
 const TABS = [
-  { id: "pricing",   label: "Pricing",   icon: Tag },
-  { id: "hours",     label: "Hours",     icon: Clock },
-  { id: "faq",       label: "FAQ",       icon: HelpCircle },
-  { id: "content",   label: "Content",   icon: FileText },
-  { id: "analytics", label: "Analytics", icon: BarChart2 },
+  { id: "pricing",   label: "Pricing",       icon: Tag },
+  { id: "hours",     label: "Hours",         icon: Clock },
+  { id: "faq",       label: "FAQ",           icon: HelpCircle },
+  { id: "content",   label: "Content",       icon: FileText },
+  { id: "insights",  label: "Insights",      icon: LineChartIcon },
+  { id: "tracking",  label: "Tracking Setup", icon: BarChart2 },
 ] as const;
 type Tab = (typeof TABS)[number]["id"];
 
@@ -709,6 +715,209 @@ function ContentTab({ pw, toast }: { pw: string; toast: (m: string, ok?: boolean
   );
 }
 
+// ── INSIGHTS TAB ──────────────────────────────────────────────
+type AnalyticsPayload = {
+  range: { from: string; to: string };
+  orders: {
+    total_orders: number;
+    total_revenue: number;
+    paid_orders: number;
+    unpaid_orders: number;
+    avg_order_value: number;
+    status_breakdown: Record<string, number>;
+    source_breakdown: Record<string, number>;
+    orders_over_time: { date: string; count: number; revenue: number }[];
+  };
+  referral_breakdown: {
+    referral_ref: string;
+    order_count: number;
+    revenue: number;
+    decoded_utm: { utm_source?: string; utm_medium?: string; utm_campaign?: string; utm_content?: string } | null;
+  }[];
+  tracking: {
+    total_page_views: number;
+    total_booking_clicks: number;
+    click_through_rate: number;
+    by_channel: { messenger: number; web: number };
+    by_utm: {
+      utm_source: string | null;
+      utm_medium: string | null;
+      utm_campaign: string | null;
+      utm_content: string | null;
+      page_views: number;
+      booking_clicks: number;
+    }[];
+    clicks_over_time: { date: string; page_views: number; booking_clicks: number }[];
+  };
+};
+
+function peso(n: number) {
+  return `₱${Math.round(n).toLocaleString("en-PH")}`;
+}
+
+function KpiCard({ icon: Icon, label, value, color }: { icon: React.ElementType; label: string; value: string; color: string }) {
+  return (
+    <div className="bg-white rounded-2xl border border-slate-200 p-5">
+      <div className="flex items-center gap-2 mb-2">
+        <span className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: color + "18" }}>
+          <Icon className="w-4 h-4" style={{ color }} />
+        </span>
+        <p className="text-xs font-medium" style={{ color: "#64748B" }}>{label}</p>
+      </div>
+      <p className="text-2xl font-bold" style={{ color: "#0F172A" }}>{value}</p>
+    </div>
+  );
+}
+
+function InsightsTab({ pw, toast }: { pw: string; toast: (m: string, ok?: boolean) => void }) {
+  const [data, setData] = useState<AnalyticsPayload | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/admin/analytics", { headers: apiHeaders(pw) })
+      .then(async (r) => {
+        if (!r.ok) throw new Error(await r.text());
+        return r.json();
+      })
+      .then(setData)
+      .catch(() => { setError(true); toast("Failed to load insights", false); })
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) return <div className="flex justify-center py-20"><Spinner /></div>;
+  if (error || !data) return <p className="text-sm" style={{ color: "#64748B" }}>Couldn&apos;t load insights right now.</p>;
+
+  const utmLabel = (row: { utm_source: string | null; utm_medium: string | null; utm_campaign: string | null; utm_content: string | null }) =>
+    row.utm_content || row.utm_campaign || row.utm_source || "(direct/organic)";
+
+  const utmChartData = data.tracking.by_utm
+    .filter((r) => r.utm_source)
+    .slice(0, 10)
+    .map((r) => ({ name: utmLabel(r), "Page views": r.page_views, "Booking clicks": r.booking_clicks }));
+
+  return (
+    <div className="space-y-6 max-w-5xl">
+      <p className="text-xs" style={{ color: "#94A3B8" }}>
+        Last 30 days · {new Date(data.range.from).toLocaleDateString()} – {new Date(data.range.to).toLocaleDateString()}
+      </p>
+
+      {/* KPI row */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+        <KpiCard icon={ShoppingBag} label="Orders" value={String(data.orders.total_orders)} color="#38a9c2" />
+        <KpiCard icon={DollarSign} label="Revenue" value={peso(data.orders.total_revenue)} color="#16a34a" />
+        <KpiCard icon={TrendingUp} label="Avg order value" value={peso(data.orders.avg_order_value)} color="#0d3d4f" />
+        <KpiCard icon={MousePointerClick} label="Booking clicks" value={String(data.tracking.total_booking_clicks)} color="#fdca00" />
+        <KpiCard icon={LineChartIcon} label="Click-through rate" value={`${(data.tracking.click_through_rate * 100).toFixed(1)}%`} color="#1877f2" />
+      </div>
+
+      {/* Orders over time */}
+      <div className="bg-white rounded-2xl border border-slate-200 p-5">
+        <p className="text-sm font-semibold mb-4" style={{ color: "#0F172A" }}>Orders &amp; revenue over time</p>
+        <ResponsiveContainer width="100%" height={260}>
+          <LineChart data={data.orders.orders_over_time}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+            <XAxis dataKey="date" tick={{ fontSize: 11 }} />
+            <YAxis yAxisId="left" tick={{ fontSize: 11 }} />
+            <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 11 }} />
+            <Tooltip formatter={(value, name) => (name === "Revenue" ? peso(Number(value)) : value)} />
+            <Legend />
+            <Line yAxisId="left" type="monotone" dataKey="count" name="Orders" stroke="#38a9c2" strokeWidth={2} dot={false} />
+            <Line yAxisId="right" type="monotone" dataKey="revenue" name="Revenue" stroke="#fdca00" strokeWidth={2} dot={false} />
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
+
+      {/* Booking clicks by campaign */}
+      <div className="bg-white rounded-2xl border border-slate-200 p-5">
+        <p className="text-sm font-semibold mb-1" style={{ color: "#0F172A" }}>Booking clicks by campaign</p>
+        <p className="text-xs mb-4" style={{ color: "#94A3B8" }}>
+          Reliable — sourced from this site&apos;s own click tracking, e.g. a Meta ad with <code>utm_content=ad1</code>.
+        </p>
+        {utmChartData.length === 0 ? (
+          <p className="text-sm py-8 text-center" style={{ color: "#94A3B8" }}>No UTM-tagged traffic yet.</p>
+        ) : (
+          <ResponsiveContainer width="100%" height={260}>
+            <BarChart data={utmChartData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+              <XAxis dataKey="name" tick={{ fontSize: 11 }} />
+              <YAxis tick={{ fontSize: 11 }} />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="Page views" fill="#b3dde8" />
+              <Bar dataKey="Booking clicks" fill="#38a9c2" />
+            </BarChart>
+          </ResponsiveContainer>
+        )}
+      </div>
+
+      {/* UTM breakdown table */}
+      <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+        <div className="px-5 py-4 border-b border-slate-100">
+          <p className="text-sm font-semibold" style={{ color: "#0F172A" }}>Traffic by source / medium / campaign / content</p>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="text-left" style={{ color: "#94A3B8" }}>
+                <th className="px-5 py-2 font-medium">Source</th>
+                <th className="px-5 py-2 font-medium">Medium</th>
+                <th className="px-5 py-2 font-medium">Campaign</th>
+                <th className="px-5 py-2 font-medium">Content</th>
+                <th className="px-5 py-2 font-medium text-right">Page views</th>
+                <th className="px-5 py-2 font-medium text-right">Booking clicks</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {data.tracking.by_utm.map((row, i) => (
+                <tr key={i}>
+                  <td className="px-5 py-2.5">{row.utm_source ?? "(direct)"}</td>
+                  <td className="px-5 py-2.5">{row.utm_medium ?? "—"}</td>
+                  <td className="px-5 py-2.5">{row.utm_campaign ?? "—"}</td>
+                  <td className="px-5 py-2.5">{row.utm_content ?? "—"}</td>
+                  <td className="px-5 py-2.5 text-right">{row.page_views}</td>
+                  <td className="px-5 py-2.5 text-right font-semibold" style={{ color: "#38a9c2" }}>{row.booking_clicks}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Approximate: orders reconciled via Messenger referral code */}
+      <div className="rounded-2xl border overflow-hidden" style={{ borderColor: "#f1f5f9", background: "#f8fafc" }}>
+        <div className="px-5 py-4 border-b" style={{ borderColor: "#f1f5f9" }}>
+          <p className="text-sm font-semibold" style={{ color: "#0F172A" }}>Orders by referral (approximate)</p>
+          <p className="text-xs mt-0.5" style={{ color: "#94A3B8" }}>
+            Best-effort match via the Messenger referral code — only covers bookings made through Messenger,
+            and isn&apos;t guaranteed. Not available for Web Booking orders.
+          </p>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="text-left" style={{ color: "#94A3B8" }}>
+                <th className="px-5 py-2 font-medium">Referral</th>
+                <th className="px-5 py-2 font-medium text-right">Orders</th>
+                <th className="px-5 py-2 font-medium text-right">Revenue</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {data.referral_breakdown.map((row, i) => (
+                <tr key={i}>
+                  <td className="px-5 py-2.5">{row.referral_ref}</td>
+                  <td className="px-5 py-2.5 text-right">{row.order_count}</td>
+                  <td className="px-5 py-2.5 text-right">{peso(row.revenue)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── ANALYTICS TAB ────────────────────────────────────────────
 const TRACKERS = [
   {
@@ -964,7 +1173,8 @@ export default function AdminPage() {
         {tab === "hours"     && <HoursTab     pw={pw} toast={showToast} />}
         {tab === "faq"       && <FaqTab       pw={pw} toast={showToast} />}
         {tab === "content"   && <ContentTab   pw={pw} toast={showToast} />}
-        {tab === "analytics" && <AnalyticsTab pw={pw} toast={showToast} />}
+        {tab === "insights"  && <InsightsTab  pw={pw} toast={showToast} />}
+        {tab === "tracking"  && <AnalyticsTab pw={pw} toast={showToast} />}
       </main>
 
       {toast && <Toast msg={toast.msg} ok={toast.ok} />}
