@@ -8,6 +8,9 @@ export const metadata: Metadata = {
   title: "Laundry Price List — Affordable Rates | The Laundry Project",
   description:
     "Transparent, affordable pricing for machine wash, dry cleaning, ironing, shoe cleaning & more in Makati City.",
+  alternates: {
+    canonical: "/pricing",
+  },
 };
 
 export default function PricingPage() {

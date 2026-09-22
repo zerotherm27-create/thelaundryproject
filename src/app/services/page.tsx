@@ -7,6 +7,9 @@ export const metadata: Metadata = {
   title: "Laundry Services — Machine Wash, Dry Cleaning & More | The Laundry Project",
   description:
     "Professional machine wash, hand wash, dry cleaning, press/ironing, express service & shoe cleaning in Makati City.",
+  alternates: {
+    canonical: "/services",
+  },
 };
 
 const services = [

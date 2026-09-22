@@ -4,6 +4,9 @@ import PolicyLayout, { PolicySection } from "@/components/PolicyLayout";
 export const metadata: Metadata = {
   title: "Terms of Service | The Laundry Project",
   description: "Terms and conditions for using The Laundry Project's laundry, dry-cleaning, and delivery services in Metro Manila.",
+  alternates: {
+    canonical: "/terms-of-service",
+  },
 };
 
 const UPDATED = "25 May 2026";

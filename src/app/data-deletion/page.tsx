@@ -4,6 +4,9 @@ import PolicyLayout, { PolicySection } from "@/components/PolicyLayout";
 export const metadata: Metadata = {
   title: "Data Deletion Policy | The Laundry Project",
   description: "How to request deletion of your personal data held by The Laundry Project. Your right to erasure under GDPR and the Philippines Data Privacy Act.",
+  alternates: {
+    canonical: "/data-deletion",
+  },
 };
 
 const UPDATED = "25 May 2026";
