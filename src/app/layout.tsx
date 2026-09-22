@@ -33,6 +33,9 @@ export const metadata: Metadata = {
       "max-video-preview": -1,
     },
   },
+  verification: {
+    google: "UvPZTdxwY05uVI1xlYqZr11fXBurK159VBdG-hFTx4M",
+  },
   openGraph: {
     title: "The Laundry Project | Where Freshness Meets Convenience",
     description: "Professional laundry, dry cleaning & pickup/delivery in Makati & Sampaloc, Manila.",
