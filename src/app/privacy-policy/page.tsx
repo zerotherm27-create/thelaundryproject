@@ -4,6 +4,9 @@ import PolicyLayout, { PolicySection } from "@/components/PolicyLayout";
 export const metadata: Metadata = {
   title: "Privacy Policy | The Laundry Project",
   description: "How The Laundry Project collects, uses, and protects your personal data. Compliant with the Philippines Data Privacy Act (RA 10173) and GDPR.",
+  alternates: {
+    canonical: "/privacy-policy",
+  },
   robots: { index: true, follow: true },
 };
 

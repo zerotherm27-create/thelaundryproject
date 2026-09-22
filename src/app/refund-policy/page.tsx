@@ -4,6 +4,9 @@ import PolicyLayout, { PolicySection } from "@/components/PolicyLayout";
 export const metadata: Metadata = {
   title: "Refund Policy | The Laundry Project",
   description: "The Laundry Project's refund and re-service policy. Service credit applies to completed orders. Cancelled prepaid bookings are refunded via Xendit to the original payment method.",
+  alternates: {
+    canonical: "/refund-policy",
+  },
 };
 
 const UPDATED = "25 May 2026";

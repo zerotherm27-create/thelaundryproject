@@ -6,6 +6,9 @@ export const metadata: Metadata = {
   title: "Our Location — Makati City | The Laundry Project",
   description:
     "Visit The Laundry Project at 7533 Santillan St., Makati City. Open Monday–Sunday, 9am–6pm. Pickup & delivery available across Metro Manila.",
+  alternates: {
+    canonical: "/locations",
+  },
 };
 
 const hours = [

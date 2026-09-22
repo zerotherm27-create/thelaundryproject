@@ -19,6 +19,9 @@ export const metadata: Metadata = {
   title: "The Laundry Project — Professional Laundry & Dry Cleaning in Metro Manila",
   description:
     "Professional laundry, dry cleaning & pickup/delivery across Metro Manila. Book in seconds via Facebook Messenger. GCash, Maya & cash accepted.",
+  alternates: {
+    canonical: "/",
+  },
   openGraph: {
     title: "The Laundry Project — Fresh Clothes, Zero Hassle.",
     description:

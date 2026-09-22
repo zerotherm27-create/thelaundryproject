@@ -14,10 +14,25 @@ const geistSans = Geist({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://www.thelaundryproject.ph"),
   title: "Laundry & Dry Cleaning Service in Makati | The Laundry Project",
   description:
     "Professional laundry, dry cleaning & pickup/delivery service in Makati & Sampaloc, Manila. Book online in seconds — The Laundry Project.",
   keywords: "laundry service Makati, dry cleaning Manila, laundromat Sampaloc, pickup delivery laundry Philippines",
+  alternates: {
+    canonical: "/",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
   openGraph: {
     title: "The Laundry Project | Where Freshness Meets Convenience",
     description: "Professional laundry, dry cleaning & pickup/delivery in Makati & Sampaloc, Manila.",
