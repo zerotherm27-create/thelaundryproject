@@ -14,7 +14,6 @@ import FAQLoader from "@/components/FAQLoader";
 import PricingTablesLoader from "@/components/PricingTablesLoader";
 import { createServerClient } from "@/lib/supabase";
 import type { OperatingHour } from "@/lib/supabase";
-import { ShaderBackground } from "@/components/ui/shader-background";
 
 export const metadata: Metadata = {
   title: "The Laundry Project — Professional Laundry & Dry Cleaning in Metro Manila",
@@ -317,20 +316,19 @@ export default async function HomePage() {
           3. Wave breathing (.animate-wave-breathe)
       ════════════════════════════════════════════════════════ */}
       <section id="home" className="relative overflow-hidden" aria-labelledby="hero-heading">
-        {/* Full-bleed staff photo — swap /images/hero-full-bleed.png for the real wide shop photo when it's ready */}
+        {/* Full-bleed staff photo. object-position keeps the staff member in frame on narrow/tall
+            viewports, where object-cover would otherwise crop to the image's horizontal center
+            (the hallway/fans behind her) and cut her out of the shot entirely. */}
         <div className="absolute inset-0 z-0 bg-[#0d3d4f]">
           <Image
             src="/images/hero-full-bleed.jpg"
             alt="The Laundry Project staff member loading a washing machine in the Makati shop"
             fill
             sizes="100vw"
-            className="object-cover"
+            className="object-cover object-[72%_center] lg:object-center"
             preload
           />
         </div>
-
-        {/* Shader kept as a tint over the photo for brand motion, not the base layer */}
-        <ShaderBackground className="absolute inset-0 z-[1] mix-blend-multiply opacity-50" />
 
         {/* Legibility scrim — darkest where the text sits (left), fading toward the photo */}
         <div
@@ -421,9 +419,9 @@ export default async function HomePage() {
               </div>
             </AnimateOnScroll>
 
-            {/* 9+ years badge */}
+            {/* 9+ years badge — desktop only; on mobile the same info is in the trust-badges row above, and the text column has no headroom for an absolutely-positioned badge without overlap */}
             <div
-              className="absolute bottom-8 right-6 lg:right-12 z-10 rounded-2xl shadow-xl px-4 py-3 text-center text-white"
+              className="hidden lg:block absolute bottom-8 right-6 lg:right-12 z-10 rounded-2xl shadow-xl px-4 py-3 text-center text-white"
               style={{ background: "linear-gradient(135deg, #0d3d4f, #38a9c2)", border: "2px solid rgba(255,255,255,0.18)" }}
             >
               <p className="text-3xl font-bold leading-none">9+</p>
