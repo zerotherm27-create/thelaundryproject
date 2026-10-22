@@ -1,6 +1,9 @@
 import Link from "next/link";
+import Image from "next/image";
 import { MapPin, Phone, Mail } from "lucide-react";
 import Logo from "./Logo";
+
+const BIR_VERIFY_URL = "https://verify.bir.gov.ph/correspondence/0155a0d9f83e480e9ed57dd21c93e057";
 
 function FbIcon() {
   return (
@@ -129,6 +132,29 @@ export default function Footer() {
             >
               <span className="text-xs font-semibold" style={{ color: "#fdca00" }}>Powered by LaundroBot</span>
             </a>
+
+            {/* BIR registration badge — QR must stay scannable, so keep it large and unprocessed */}
+            <div className="self-start">
+              <a
+                href={BIR_VERIFY_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Verify Rinselab Inc. registration on the BIR website (opens in a new tab)"
+                className="block rounded-xl bg-white p-2 w-full max-w-[400px] transition-opacity hover:opacity-90"
+              >
+                <Image
+                  src="/images/bir-registered.jpg"
+                  alt="Bureau of Internal Revenue registered badge, RSN 048RC20260000003426. Click to verify."
+                  width={510}
+                  height={179}
+                  unoptimized
+                  className="w-full h-auto"
+                />
+              </a>
+              <p className="text-xs text-slate-500 mt-2">
+                The Laundry Project is a brand of Rinselab Inc. Click the badge to verify.
+              </p>
+            </div>
           </div>
         </div>
 
